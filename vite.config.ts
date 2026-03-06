@@ -7,6 +7,13 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
+    // ... 기존 코드 위쪽
+export default defineConfig({
+  base: '/innoup-landing-page/', // <-- 10번 줄 자리에 이 코드를 새로 넣으세요!
+  define: {
+    'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+  },
+// ... 기존 코드 아래쪽
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
