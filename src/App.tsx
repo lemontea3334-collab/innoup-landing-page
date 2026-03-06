@@ -2,9 +2,9 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { HashRouter, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter, Routes, Route, Link } from 'react-router-dom';
 import AdminPage from './pages/AdminPage';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { ArrowRight, Check, ChevronDown, Menu, X, BarChart3, Target, Zap, Users, Lightbulb, TrendingUp, Star, Quote } from 'lucide-react';
@@ -862,11 +862,11 @@ function Home() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
