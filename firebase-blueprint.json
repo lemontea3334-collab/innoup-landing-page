@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "Contact": {
+      "title": "Contact Form Submission",
+      "description": "Stores contact form submissions from potential clients.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the person submitting the form."
+        },
+        "company": {
+          "type": "string",
+          "description": "Company name of the person submitting the form."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the person submitting the form."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message or inquiry content."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the submission was created."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "read", "replied"],
+          "description": "Status of the inquiry."
+        }
+      },
+      "required": ["name", "company", "phone", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "contacts/{contactId}": {
+      "schema": "Contact",
+      "description": "Collection of contact form submissions."
+    }
+  }
+}

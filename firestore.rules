@@ -1,0 +1,86 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// This security rules file assumes the following data structures:
+//
+// Collection: contacts
+// Document ID: [auto-generated]
+// Fields:
+//   - name: string (required, 1-100 chars) - Name of the person submitting the form.
+//   - company: string (required, 1-100 chars) - Company name.
+//   - phone: string (required, 10-20 chars) - Phone number.
+//   - message: string (required, 1-2000 chars) - Inquiry content.
+//   - createdAt: timestamp (required) - Submission time.
+//   - status: string (optional, enum: 'new', 'read', 'replied') - Inquiry status.
+//
+// ===============================================================
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user is an admin (using email verification for the specific user)
+    function isAdmin() {
+      return isAuthenticated() &&
+        request.auth.token.email == "lemontea3334@gmail.com" && 
+        request.auth.token.email_verified == true;
+    }
+
+    // Validate required fields exist
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Validate that the document contains only the allowed fields
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Validate string length
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidContact(data) {
+      return hasRequiredFields(['name', 'company', 'phone', 'message', 'createdAt']) &&
+             hasOnlyAllowedFields(['name', 'company', 'phone', 'message', 'createdAt', 'status']) &&
+             validStringLength('name', 1, 100) &&
+             validStringLength('company', 1, 100) &&
+             validStringLength('phone', 10, 20) &&
+             validStringLength('message', 1, 2000) &&
+             data.createdAt is timestamp &&
+             // Status is optional on create, but if present must be 'new'
+             (!('status' in data) || data.status == 'new');
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    match /contacts/{contactId} {
+      // Allow anyone (even unauthenticated) to create a contact submission
+      // This is necessary for a public contact form
+      allow create: if isValidContact(request.resource.data);
+
+      // Only admins can read, update, or delete contact submissions
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
